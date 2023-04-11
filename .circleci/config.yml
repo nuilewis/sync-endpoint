@@ -21,6 +21,13 @@ jobs:
       - run:
           name: Enable Swarm mode in Docker
           command: docker swarm init
+
+      #Install Maven and Ant
+      - run:
+          name: install Maven and Ant
+          command: sudo apt-get update && sudo apt-get install -y ant maven
+     
+     #Install Maven and Ant
       - run:
           name: Build Sync-Endpoint
           command: mvn clean install
