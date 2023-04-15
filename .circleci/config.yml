@@ -27,8 +27,8 @@ jobs:
       - run:
           name: "Start Service and Check That it’s Running"
           command: |
-            docker run -d --name my-app my-app
-            docker exec my-app curl --retry 10 --retry-connrefused http://localhost:5432
+            docker run my-image
+            docker exec my-image curl --retry 10 --retry-connrefused http://localhost:5432
 
       #Install Maven and Ant
       - run:
