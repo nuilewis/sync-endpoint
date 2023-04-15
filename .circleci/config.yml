@@ -21,13 +21,6 @@ jobs:
           name: Enable Swarm mode in Docker
           command: docker swarm init
 
-      # Start service
-      - run:
-          name: "Start Service and Check That it’s Running"
-          command: |
-            docker run my-image
-            docker exec my-image curl --retry 10 --retry-connrefused http://localhost:5432
-
       #Install Maven and Ant
       - run:
           name: install Maven and Ant
