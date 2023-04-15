@@ -31,7 +31,7 @@ jobs:
      #Install Maven and Ant
       - run:
           name: Build Sync-Endpoint
-          command: mvn clean install
+          command: docker mvn clean install
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
