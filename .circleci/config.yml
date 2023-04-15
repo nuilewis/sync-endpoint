@@ -5,44 +5,63 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  build:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/configuration-reference/#executor-job
-    docker:
-      - image: cimg/base:2022.06
-    # Add steps to the job
-    # See: https://circleci.com/docs/configuration-reference/#steps
-    steps:
-    # ... steps for building/testing app ...
-      - setup_remote_docker:
-          version: 20.10.18
-          # docker_layer_caching: true
-      - checkout
-      #Enable Swarm Mode
-      - run:
-          name: Enable Swarm mode in Docker
-          command: docker swarm init
+  # build:
+  #   # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
+  #   # See: https://circleci.com/docs/configuration-reference/#executor-job
+  #   docker:
+  #     - image: cimg/base:2022.06
+  #   # Add steps to the job
+  #   # See: https://circleci.com/docs/configuration-reference/#steps
+  #   steps:
+  #   # ... steps for building/testing app ...
+  #     - setup_remote_docker:
+  #         version: 20.10.18
+  #         # docker_layer_caching: true
+  #     - checkout
+  #     #Enable Swarm Mode
+  #     - run:
+  #         name: Enable Swarm mode in Docker
+  #         command: docker swarm init
 
-      # Start service
-      - run:
-          name: "Start Service and Check That it’s Running"
-          command: |
-            docker run my-image
-            docker exec my-image curl --retry 10 --retry-connrefused http://localhost:5432
+  #     # Start service
+  #     - run:
+  #         name: "Start Service and Check That it’s Running"
+  #         command: |
+  #           docker run my-image
+  #           docker exec my-image curl --retry 10 --retry-connrefused http://localhost:5432
 
-      #Install Maven and Ant
-      - run:
-          name: install Maven and Ant
-          command: sudo apt-get update && sudo apt-get install -y ant maven
+  #     #Install Maven and Ant
+  #     - run:
+  #         name: install Maven and Ant
+  #         command: sudo apt-get update && sudo apt-get install -y ant maven
      
-     #Install Maven and Ant
-      - run:
-          name: Build Sync-Endpoint
-          command: mvn clean install
-
+  #    #Install Maven and Ant
+  #     - run:
+  #         name: Build Sync-Endpoint
+  #         command: mvn clean install
+  machine-work:
+    machine:
+      image: ubuntu-2204:2022.04.2
+    steps:
+        - checkout
+     # start proprietary DB using private Docker image
+     # with credentials stored in the UI
+        - run: |
+            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+            docker run -d --name db company/proprietary-db:1.2.3
+        - run:
+            name: Enable Swarm Mode
+            command: docker swarm init
+        - run:
+            name: Installe Dependencies (Maven and Ant)
+            command: sudo apt-get update && sudo apt-get install -y ant maven
+        - run:
+            name: build project
+            command: mvn clean install
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
   build-workflow:
     jobs:
-      - build
+      # - build
+      - machine-work
