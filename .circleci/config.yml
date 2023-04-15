@@ -16,12 +16,19 @@ jobs:
     # ... steps for building/testing app ...
       - setup_remote_docker:
           version: 20.10.18
-          docker_layer_caching: true
+          # docker_layer_caching: true
       - checkout
       #Enable Swarm Mode
-      # - run:
-      #     name: Enable Swarm mode in Docker
-      #     command: docker swarm init
+      - run:
+          name: Enable Swarm mode in Docker
+          command: docker swarm init
+
+      # Start service
+      - run:
+          name: "Start Service and Check That it’s Running"
+          command: |
+            docker run -d --name my-app my-app
+            docker exec my-app curl --retry 10 --retry-connrefused http://localhost:5432
 
       #Install Maven and Ant
       - run:
@@ -31,7 +38,7 @@ jobs:
      #Install Maven and Ant
       - run:
           name: Build Sync-Endpoint
-          command: docker mvn clean install
+          command: mvn clean install
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
